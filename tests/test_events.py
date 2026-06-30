@@ -73,6 +73,26 @@ def test_generic_events(screen: Screen):
     screen.should_contain('click_async_with_args')
 
 
+def test_listener_ids_are_monotonic(screen: Screen):
+    ids: list[str] = []
+    expected_ids: list[str] = []
+
+    @ui.page('/')
+    def page():
+        element = ui.element()
+        expected_ids.extend([f'{element.id}:0', f'{element.id}:1'])
+
+        element.on('click', lambda: None)
+        ids.append(next(iter(element._event_listeners)))  # pylint: disable=protected-access
+
+        element._event_listeners.clear()  # pylint: disable=protected-access
+        element.on('click', lambda: None)
+        ids.append(next(iter(element._event_listeners)))  # pylint: disable=protected-access
+
+    screen.open('/')
+    assert ids == expected_ids
+
+
 def test_event_with_update_before_await(screen: Screen):
     @ui.page('/')
     def page():

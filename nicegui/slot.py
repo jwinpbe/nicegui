@@ -51,6 +51,11 @@ class Slot:
         return cls.stacks[task_id]
 
     @classmethod
+    def peek_stack(cls) -> list[Slot] | None:
+        """Return the current task's slot stack without creating one."""
+        return cls.stacks.get(get_task_id())
+
+    @classmethod
     def prune_stack(cls) -> None:
         """Remove the current slot stack if it is empty."""
         task_id = get_task_id()
